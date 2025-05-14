@@ -1,18 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Post,Body, ParseIntPipe } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
+import { userDTO } from './dto/user.dto';
 
 @Controller('user')
 export class UserController{
+    // Dependency Injection
+    constructor(private readonly userService:UserService){}
   @Get()
   getAllUsers(){
-    const serviceusers=new UserService();
-    return serviceusers.getAllUsers();
+    return this.userService.getAllUsers();
   }
   @Get(':id')
-  getUser(@Param('id')id: string)
+  getUser(@Param('id',ParseIntPipe)id: number)
   {
-     const serviceUsers=new UserService();
-     return serviceUsers.getUser(+id);
+    try{
+        return this.userService.getUser(id);
+    }
+    catch(error){
+      throw new NotFoundException(error.message);
+    }
+  }
+  @Post()
+  addUser(@Body() user:userDTO){
+    return this.userService.addUser(user);
   }
 }

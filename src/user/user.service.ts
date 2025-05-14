@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseFilters } from '@nestjs/common';
+import { userDTO } from './dto/user.dto';
 @Injectable()
 export class UserService {
     private users= [
@@ -22,6 +23,19 @@ export class UserService {
         return this.users;
     }
     getUser(id:number){
-        return this.users.find((user)=> user.id === id);
+       const user = this.users.find((user)=> user.id === id);
+       if(!user){
+        throw new Error("User not found");
+       }
+       return user;
+    }
+    addUser(user:userDTO){
+        const id=Date.now();
+        // id
+        this.users.push({
+            id,
+            ...user
+        })
+        return this.getUser(id);
     }
 }
