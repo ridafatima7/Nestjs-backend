@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Controller, Get, NotFoundException, Param, Post,Body, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Post,Body, ParseIntPipe, ValidationPipe, UseGuards } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { userDTO } from './dto/user.dto';
+import { FirewallGuard } from 'src/firewall/firewall.guard';
 
 @Controller('user')
 export class UserController{
@@ -21,8 +22,9 @@ export class UserController{
       throw new NotFoundException(error.message);
     }
   }
+  @UseGuards(FirewallGuard)
   @Post()
-  addUser(@Body() user:userDTO){
+  addUser(@Body(new ValidationPipe({transform:true})) user:userDTO){
     return this.userService.addUser(user);
   }
 }
